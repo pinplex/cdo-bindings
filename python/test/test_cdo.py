@@ -227,7 +227,7 @@ class CdoTest(unittest.TestCase):
         self.assertEqual(outs[0],outs[1])
         os.remove(ofile)
         outs = []
- 
+
         # dedicated output, force = false
         ofile = 'test_force_false'
         outs.append(cdo.stdatm("0,10,20",output = ofile,force=False))
@@ -286,15 +286,15 @@ class CdoTest(unittest.TestCase):
     def test_showlevels(self):
         cdo = Cdo(cdfMod=CDF_MOD)
         sourceLevels = "25 100 250 500 875 1400 2100 3000 4000 5000".split()
-        self.assertEqual(' '.join(sourceLevels), 
-                        cdo.showlevel(input = "-selname,T " + cdo.stdatm(','.join(sourceLevels),options = "-f nc"))[0]) 
+        self.assertEqual(' '.join(sourceLevels),
+                        cdo.showlevel(input = "-selname,T " + cdo.stdatm(','.join(sourceLevels),options = "-f nc"))[0])
 
     def test_verticalLevels(self):
         cdo = Cdo(cdfMod=CDF_MOD)
         # check, if a given input files has vertival layers of a given thickness array
         targetThicknesses = [50.0,  100.0,  200.0,  300.0,  450.0,  600.0,  800.0, 1000.0, 1000.0, 1000.0]
         sourceLevels = "25 100 250 500 875 1400 2100 3000 4000 5000".split()
-        thicknesses = cdo.thicknessOfLevels(input = "-selname,T " + cdo.stdatm(','.join(sourceLevels),options = "-f nc")) 
+        thicknesses = cdo.thicknessOfLevels(input = "-selname,T " + cdo.stdatm(','.join(sourceLevels),options = "-f nc"))
         self.assertEqual(targetThicknesses,thicknesses)
 
 
@@ -785,6 +785,31 @@ class CdoTest(unittest.TestCase):
 
           tDataset = cdo.topo('global_10.0',options = '-f nc',returnXDataset = True)
           print(tDataset)
+
+          # add a modified variable into the Dataset
+          tDataset['topo_sqrt'] =  cdo.sqrt(input=tDataset, returnXArray='topo')
+
+        def test_xdataset_input_and_output(self):
+          cdo = Cdo(cdfMod='netcdf4')
+          try:
+            import xarray
+          except:
+            print("no xarray installation available!")
+            return
+
+          # make up dummy data
+          cdo.topo('global_10.0', options='-f nc', output='topo_xarray.nc')
+
+          # read in using xarray
+          ds_xarray = xarray.open_dataset('topo_xarray.nc')
+
+          # test input and output using Xarray Dataset and modify data using cdo
+          topo_nh_xarray = cdo.sellonlatbox(-180,180,0,90, input=ds_xarray, returnXDataset = True)
+
+          # do the same without xarray and check for equalitiy
+          topo_nh_cdo = cdo.sellonlatbox(-180,180,0,90, input='topo_xarray.nc', returnArray = 'topo')
+
+          self.assertEqual(np.mean(topo_nh_cdo), topo_nh_xarray['topo'].mean().values)
 
 #===============================================================================
 if __name__ == '__main__':

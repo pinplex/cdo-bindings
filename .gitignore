@@ -1,0 +1,8 @@
+*.bla
+.DS_Store
+*.pyc
+python/*.nc
+python/build
+python/dist
+python/cdo.egg-info
+python/foo.log
