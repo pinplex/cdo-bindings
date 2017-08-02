@@ -775,6 +775,8 @@ class CdoTest(unittest.TestCase):
           tArray = cdo.topo('global_10.0',options = '-f nc',returnXArray = 'topo')
           print(tArray)
 
+          # modif
+
         def test_xdataset_output(self):
           cdo = Cdo(cdfMod='netcdf4')
           try:
@@ -810,6 +812,184 @@ class CdoTest(unittest.TestCase):
           topo_nh_cdo = cdo.sellonlatbox(-180,180,0,90, input='topo_xarray.nc', returnArray = 'topo')
 
           self.assertEqual(np.mean(topo_nh_cdo), topo_nh_xarray['topo'].mean().values)
+
+        def test_xarray_median(self):
+          cdo = Cdo(cdfMod='netcdf4')
+          try:
+            import xarray
+          except:
+            print("no xarray installation available!")
+            return
+
+          # make up dummy data
+          cdo.topo('global_10.0', options='-f nc', output='topo_xarray.nc')
+
+          # read data with xarray and calculate median
+          ds = xarray.open_dataset('topo_xarray.nc')
+          median_xarray = ds['topo'].median()
+
+          # calculate fld median using cdo
+          median_cdo = cdo.outputf('%.10g', options='-b F32', input='-fldpctl,50 topo_xarray.nc')
+          median_cdo = float(median_cdo[0])
+
+          # check if the values are approx. equal
+          self.assertAlmostEqual(median_cdo, median_xarray)
+
+        def test_xarray_sum(self):
+          cdo = Cdo(cdfMod='netcdf4')
+          try:
+            import xarray
+          except:
+            print("no xarray installation available!")
+            return
+
+          # make up dummy data
+          cdo.topo('global_10.0', options='-f nc', output='topo_xarray.nc')
+
+          # read data with xarray and calculate sum
+          ds = xarray.open_dataset('topo_xarray.nc')
+          sum_xarray = ds['topo'].sum()
+
+          # calculate fldsum using cdo
+          sum_cdo = cdo.outputf('%.10g', input='-fldsum topo_xarray.nc')
+          sum_cdo = float(sum_cdo[0])
+
+          # check if the values are approx. equal
+          self.assertAlmostEqual(sum_cdo, sum_xarray) #, places=1)
+
+        def test_xarray_min(self):
+          cdo = Cdo(cdfMod='netcdf4')
+          try:
+            import xarray
+          except:
+            print("no xarray installation available!")
+            return
+
+          # make up dummy data
+          cdo.topo('global_10.0', options='-f nc', output='topo_xarray.nc')
+
+          # read data with xarray and calculate minimum
+          ds = xarray.open_dataset('topo_xarray.nc')
+          min_xarray = ds['topo'].min()
+
+          # calculate fldmin using cdo
+          min_cdo = cdo.outputf('%.10g', input='-fldmin topo_xarray.nc')
+          min_cdo = float(min_cdo[0])
+
+          # check if the values are approx. equal
+          self.assertAlmostEqual(min_cdo, min_xarray) #, places=1)
+
+        def test_xarray_max(self):
+          cdo = Cdo(cdfMod='netcdf4')
+          try:
+            import xarray
+          except:
+            print("no xarray installation available!")
+            return
+
+          # make up dummy data
+          cdo.topo('global_10.0', options='-f nc', output='topo_xarray.nc')
+
+          # read data with xarray and calculate maximum
+          ds = xarray.open_dataset('topo_xarray.nc')
+          max_xarray = ds['topo'].max()
+
+          # calculate fldmax using cdo
+          max_cdo = cdo.outputf('%.10g', input='-fldmax topo_xarray.nc')
+          max_cdo = float(max_cdo[0])
+
+          # check if the values are approx. equal
+          self.assertAlmostEqual(max_cdo, max_xarray) #, places=1)
+
+        def test_xarray_sin(self):
+          cdo = Cdo(cdfMod='netcdf4')
+          try:
+            import xarray
+          except:
+            print("no xarray installation available!")
+            return
+
+          try:
+            import numpy
+          except:
+            print("no numpy installation available!")
+            return
+
+          # make up dummy data
+          cdo.topo('global_10.0', options='-f nc', output='topo_xarray.nc')
+
+          # read data with xarray and calculate the sinus and sum
+          ds = xarray.open_dataset('topo_xarray.nc')
+          sum_sin_xarray = numpy.sin(ds['topo']).sum()
+
+          # calculate fldsum of sinus using cdo
+          sum_sin_cdo = cdo.outputf('%.10g', input='-fldsum -sin topo_xarray.nc')
+          sum_sin_cdo = float(sum_sin_cdo[0])
+
+          # check if the values are approx. equal
+          self.assertAlmostEqual(sum_sin_cdo, sum_sin_xarray)
+
+
+        def test_xarray_sqrt(self):
+          cdo = Cdo(cdfMod='netcdf4')
+          try:
+            import xarray
+          except:
+            print("no xarray installation available!")
+            return
+
+          try:
+            import numpy
+          except:
+            print("no numpy installation available!")
+            return
+
+          # make up dummy data
+          cdo.topo('global_10.0', options='-f nc', output='topo_xarray.nc')
+
+          # read data with xarray and calculate sum of the square root of the abs number
+          ds = xarray.open_dataset('topo_xarray.nc')
+          sum_sqrt_xarray = numpy.sqrt(numpy.abs(ds['topo'])).sum()
+
+          # calculate fldsum of the square root of the abs number using cdo
+          sum_sqrt_cdo = cdo.outputf('%.10g', input='-fldsum -sqrt -abs topo_xarray.nc')
+          sum_sqrt_cdo = float(sum_sqrt_cdo[0])
+
+          # check if the values are approx. equal
+          self.assertAlmostEqual(sum_sqrt_cdo, sum_sqrt_xarray)
+
+
+        def test_xarray_expr(self):
+          cdo = Cdo(cdfMod='netcdf4')
+          try:
+            import xarray
+          except:
+            print("no xarray installation available!")
+            return
+
+          try:
+            import numpy
+          except:
+            print("no numpy installation available!")
+            return
+
+          # make up dummy data
+          cdo.topo('global_10.0', options='-f nc', output='topo_xarray.nc')
+
+          # read data with xarray and evaluate more sophisticated expression
+          ds = xarray.open_dataset('topo_xarray.nc')
+          lats, lons = numpy.meshgrid(ds['lat'], ds['lon'])
+          windfield_xarray = numpy.sin(numpy.deg2rad(lats.T) * 2)  # transpose the lats array
+
+          # evaluate same more sophisticated expression using cdo
+          windfield_cdo = cdo.expr("'wind_u=sin(2*rad(clat(topo)))'",
+                                   options='-b F32',
+                                   input='topo_xarray.nc',
+                                   returnArray='wind_u')
+
+          # check if the values are approx. equal
+          self.assertAlmostEqual(0, numpy.sum(windfield_xarray - windfield_cdo))
+
 
 #===============================================================================
 if __name__ == '__main__':
