@@ -855,7 +855,7 @@ class CdoTest(unittest.TestCase):
           sum_cdo = float(sum_cdo[0])
 
           # check if the values are approx. equal
-          self.assertAlmostEqual(sum_cdo, sum_xarray) #, places=1)
+          self.assertAlmostEqual(sum_cdo, round(sum_xarray.data, 8), places=1)
 
         def test_xarray_min(self):
           cdo = Cdo(cdfMod='netcdf4')
@@ -877,7 +877,7 @@ class CdoTest(unittest.TestCase):
           min_cdo = float(min_cdo[0])
 
           # check if the values are approx. equal
-          self.assertAlmostEqual(min_cdo, min_xarray) #, places=1)
+          self.assertAlmostEqual(min_cdo, round(min_xarray.data, 8), places=5)
 
         def test_xarray_max(self):
           cdo = Cdo(cdfMod='netcdf4')
@@ -899,7 +899,7 @@ class CdoTest(unittest.TestCase):
           max_cdo = float(max_cdo[0])
 
           # check if the values are approx. equal
-          self.assertAlmostEqual(max_cdo, max_xarray) #, places=1)
+          self.assertAlmostEqual(max_cdo, round(max_xarray.data, 8), places=5)
 
         def test_xarray_sin(self):
           cdo = Cdo(cdfMod='netcdf4')
@@ -956,7 +956,7 @@ class CdoTest(unittest.TestCase):
           sum_sqrt_cdo = float(sum_sqrt_cdo[0])
 
           # check if the values are approx. equal
-          self.assertAlmostEqual(sum_sqrt_cdo, sum_sqrt_xarray)
+          self.assertAlmostEqual(sum_sqrt_cdo, round(sum_sqrt_xarray.data, 8), places=3)
 
 
         def test_xarray_expr(self):
