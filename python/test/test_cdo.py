@@ -927,7 +927,7 @@ class CdoTest(unittest.TestCase):
           sum_sin_cdo = float(sum_sin_cdo[0])
 
           # check if the values are approx. equal
-          self.assertAlmostEqual(sum_sin_cdo, sum_sin_xarray)
+          self.assertAlmostEqual(sum_sin_cdo, round(sum_sin_xarray.data, 8), places=5)
 
 
         def test_xarray_sqrt(self):
